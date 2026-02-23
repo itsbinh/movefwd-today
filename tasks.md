@@ -1,6 +1,7 @@
 # Movefwd.today — Task Tracker
 
 > **Tracking:** Markdown files in workspace (Obsidian-compatible)
+>
 > - `tasks.md` — This file
 > - `stack.md` — Tech stack
 > - `brand.md` — Brand quick ref
@@ -42,28 +43,28 @@
 
 ### Week 1: Data & Backend
 
-- [ ] Create Supabase schema (resources, users, opportunities)
+- [x] Create Supabase schema (resources, users, opportunities)
 - [ ] Seed with sample data (10-20 resources)
 - [ ] Set up authentication (Supabase Auth)
-- [ ] Build API endpoints
+- [x] Build API endpoints
 
 ### Week 2: Frontend — Map & List
 
-- [ ] Implement Mapbox map view
-- [ ] Create resource list view
-- [ ] Build category filters
-- [ ] Add search functionality
+- [x] Implement Mapbox map view
+- [x] Create resource list view
+- [x] Build category filters
+- [x] Add search functionality
 
 ### Week 3: Resource Details
 
 - [ ] Resource detail page
 - [ ] "How to apply" guide display
-- [ ] Contact actions (call, directions, website)
+- [x] Contact actions (call, directions, website)
 - [ ] Favorites/bookmarks
 
 ### Week 4: Polish & Test
 
-- [ ] Mobile responsive design
+- [x] Mobile responsive design
 - [ ] Performance optimization
 - [ ] User testing (5-10 people)
 - [ ] Bug fixes
@@ -134,5 +135,5 @@ movefwd-today/
 
 ---
 
-*Tracking: Obsidian-style markdown in workspace*
-*Last updated: 2025-02-23*
+_Tracking: Obsidian-style markdown in workspace_
+_Last updated: 2025-02-23_
