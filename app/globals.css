@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 44, 44, 44;
+  --background-rgb: 254, 254, 254;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer utilities {
+  .container {
+    @apply mx-auto px-4 max-w-7xl;
+  }
+}

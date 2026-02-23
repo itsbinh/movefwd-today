@@ -31,8 +31,8 @@
 
 - [ ] Set up VPS with Docker
 - [ ] Deploy self-hosted Supabase
-- [ ] Set up Next.js project
-- [ ] Configure Tailwind CSS with brand colors
+- [x] Set up Next.js project
+- [x] Configure Tailwind CSS with brand colors
 - [ ] Set up Mapbox account
 - [ ] Configure domain DNS
 
