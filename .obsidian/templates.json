@@ -1,0 +1,15 @@
+{
+  "folder": "docs/Templates",
+  "dateFormat": "YYYY-MM-DD HH:mm",
+  "timeFormat": "HH:mm",
+  "dateTimeFormat": "YYYY-MM-DD HH:mm:ss",
+  "syntaxHighlighting": true,
+  "enabledFunctionsTestSystem": false,
+  "enableFolderTemplates": true,
+  "enableSystemCommands": false,
+  "shellPath": "",
+  "userScriptFunctions": [],
+  "enableActiveFileTemplates": true,
+  "enableDailyNotesTemplates": true,
+  "triggerOnNewFileCreation": true
+}

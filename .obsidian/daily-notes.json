@@ -1,0 +1,6 @@
+{
+  "folder": "docs/Daily Notes",
+  "dateFormat": "YYYY-MM-DD",
+  "templateFile": "docs/Templates/Daily Note Template.md",
+  "newFileLocation": "folder"
+}

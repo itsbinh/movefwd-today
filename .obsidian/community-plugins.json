@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": [
+    "daily-notes",
+    "graph",
+    "backlink",
+    "page-preview",
+    "command-palette",
+    "markdown-importer",
+    "word-count",
+    "templates"
+  ],
+  "theme": "obsidian"
+}
