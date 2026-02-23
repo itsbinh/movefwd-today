@@ -16,6 +16,10 @@ export async function getResources(filters?: ResourceFilters): Promise<Resource[
     query = query.eq('city', filters.city)
   }
 
+  if (filters?.zip) {
+    query = query.eq('zip', filters.zip)
+  }
+
   if (filters?.verified !== undefined) {
     query = query.eq('verified', filters.verified)
   }

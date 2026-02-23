@@ -4,24 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "3ba5e359bb35130d",
+        "id": "7f56fffe00c1ca00",
         "type": "tabs",
         "children": [
           {
-            "id": "c3ca4f8d48734fcc",
+            "id": "e078258b54e40c6c",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Untitled.canvas",
-                "viewState": {
-                  "x": 0,
-                  "y": 0,
-                  "zoom": 0
-                }
-              },
-              "icon": "lucide-layout-dashboard",
-              "title": "Untitled"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -97,7 +90,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Untitled.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,7 +99,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Untitled"
+              "title": "Backlinks"
             }
           },
           {
@@ -116,12 +108,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Untitled.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Untitled"
+              "title": "Outgoing links"
             }
           },
           {
@@ -159,13 +150,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Untitled.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Untitled"
+              "title": "Outline"
             }
           }
         ]
@@ -186,24 +176,36 @@
       "bases:Create new base": false
     }
   },
-  "active": "c3ca4f8d48734fcc",
+  "active": "e078258b54e40c6c",
   "lastOpenFiles": [
-    "Untitled 2.base",
-    "Untitled.canvas",
-    "docs/05-Tasks/BOARD.md",
+    "BUILD_PROGRESS.md",
     "brand.md",
+    "BRANDING.md",
+    "USER.md",
+    "Untitled 1.base",
+    "Untitled.canvas",
+    "Untitled.base",
+    "TOOLS.md",
+    "Untitled 6.base",
+    "Untitled 5.base",
+    "Untitled 4.base",
+    "Untitled 1.canvas",
+    "Untitled 3.base",
+    "01-Architecture/stack.md",
+    "docs/00-Overview/README.md",
+    "01-Architecture",
+    "node_modules/set-function-length/README.md",
+    "Untitled 2.base",
+    "docs/05-Tasks/BOARD.md",
     "BOOTSTRAP.md",
     "AGENTS.md",
     "HEARTBEAT.md",
-    "Untitled 1.base",
     "docs/Templates/Daily Note Template.md",
     "docs/Templates/ADR Template.md",
     "docs/Templates/Task Template.md",
     "docs/Templates",
     "docs/05-Tasks/tasks.md",
     "docs/05-Tasks",
-    "docs/06-Knowledge/DECISIONS.md",
-    "docs/06-Knowledge",
-    "Untitled.base"
+    "docs/06-Knowledge/DECISIONS.md"
   ]
 }

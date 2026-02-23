@@ -5,6 +5,15 @@ import { Search, X, Filter } from 'lucide-react'
 import { ResourceCard } from './ResourceCard'
 import type { Resource, Category } from '@/types/resources'
 
+export const PUBLIC_CATEGORIES = [
+  'food',
+  'housing',
+  'health',
+  'legal',
+  'employment',
+  'education',
+] as const
+
 interface ResourceListProps {
   resources: Resource[]
   categories: Category[]
@@ -17,6 +26,9 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
   const [showFilters, setShowFilters] = useState(false)
 
   const filteredResources = resources.filter((resource) => {
+    // Exclude resources that aren't in public categories
+    if (!resource.categories.some((cat) => PUBLIC_CATEGORIES.includes(cat as any))) return false
+
     const matchesSearch =
       searchQuery === '' ||
       resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +70,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
         <div className="flex items-center justify-between">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
           >
             <Filter className="w-4 h-4" />
             Filters
@@ -72,7 +84,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
           {(searchQuery || selectedCategories.length > 0) && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-muted hover:text-text hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text-muted hover:text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
             >
               <X className="w-4 h-4" />
               Clear
@@ -89,7 +101,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   selectedCategories.includes(category)
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-text hover:bg-gray-200'
+                    : 'bg-white/30 text-text hover:bg-white/50 backdrop-blur-md transform hover:scale-105'
                 }`}
               >
                 {category}

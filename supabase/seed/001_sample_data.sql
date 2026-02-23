@@ -27,7 +27,13 @@ INSERT INTO resources (name, description, categories, eligibility, address, city
 
 -- Education resources
 ('Adult Education Center', 'GED prep and ESL classes', ARRAY['education'], 'Adult learners', '222 Learning Way', 'Los Angeles', 'CA', '90015', 34.0410, -118.2580, '(213) 555-0600', 'https://example.org/adult-ed', 'Registration ongoing. Free ESL and GED classes.', true),
-('Career Technical Training', 'Vocational training programs', ARRAY['education', 'employment'], 'Adult learners seeking job skills', '333 Skill St', 'Los Angeles', 'CA', '90014', 34.0530, -118.2420, '(213) 555-0601', 'https://example.org/vocational', 'Apply online. Some programs have waiting lists.', true);
+('Career Technical Training', 'Vocational training programs', ARRAY['education', 'employment'], 'Adult learners seeking job skills', '333 Skill St', 'Los Angeles', 'CA', '90014', 34.0530, -118.2420, '(213) 555-0601', 'https://example.org/vocational', 'Apply online. Some programs have waiting lists.', true),
+('Orange County VA Medical Center', 'Veterans health services and primary care', ARRAY['health'], 'Veterans and eligible families', '123 VA St', 'Orange County', 'CA', '92614', 33.6850, -117.8260, '(714) 555-0100', 'https://example.org/va-medical', 'Bring VA ID and insurance information.', true),
+('CalFresh Benefits Office', 'CalFresh (SNAP) benefits assistance', ARRAY['health'], 'Low-income individuals and families', '456 Benefits Rd', 'Orange County', 'CA', '92618', 33.7200, -117.8150, '(714) 555-0101', 'https://example.org/calfresh', 'Bring ID, proof of residence, and income documents.', true),
+('Sober Living Irvine', 'Transitional sober living facility', ARRAY['housing', 'health'], 'Individuals in recovery', '789 Recovery Ln', 'Orange County', 'CA', '92612', 33.6800, -117.8300, '(714) 555-0102', 'https://example.org/sober-living', 'Apply online. Requires referral.', true),
+('Orange County Food Bank', 'Food distribution for families in need', ARRAY['food'], 'Anyone in need of food assistance', '101 Food Blvd', 'Orange County', 'CA', '92620', 33.7205, -117.8000, '(714) 555-0103', 'https://example.org/oc-food-bank', 'Open Mon-Fri 9am-5pm. No ID required.', true),
+('Orange County Homeless Shelter', 'Emergency shelter and transitional housing', ARRAY['housing'], 'Homeless individuals and families', '202 Shelter St', 'Orange County', 'CA', '92630', 33.7000, -117.8500, '(714) 555-0104', 'https://example.org/oc-shelter', 'Call for intake. Bring minimal belongings.', true),
+('Santa Ana City Hall', 'City services and community resources', ARRAY['legal'], 'Residents of Orange County', '303 Civic Center', 'Orange County', 'CA', '92701', 33.7455, -117.8677, '(714) 555-0105', 'https://example.org/santa-ana-hall', 'Visit during business hours. No appointment needed.', true);
 
 -- Insert a sample profile (for testing)
 INSERT INTO profiles (id, email, role, name, organization_name) 

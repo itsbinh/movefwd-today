@@ -1,7 +1,14 @@
-'use client'
-
 import { MapPin, Phone, Globe, BadgeCheck } from 'lucide-react'
 import type { Resource } from '@/types/resources'
+
+export const CATEGORY_COLORS: Record<string, string> = {
+  food: 'bg-category-food text-white',
+  housing: 'bg-category-housing text-white',
+  health: 'bg-category-health text-white',
+  legal: 'bg-category-legal text-white',
+  employment: 'bg-category-employment text-white',
+  education: 'bg-category-education text-white',
+}
 
 interface ResourceCardProps {
   resource: Resource
@@ -9,19 +16,10 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({ resource, onClick }: ResourceCardProps) {
-  const categoryColors: Record<string, string> = {
-    food: 'bg-category-food text-white',
-    housing: 'bg-category-housing text-white',
-    health: 'bg-category-health text-white',
-    legal: 'bg-category-legal text-white',
-    employment: 'bg-category-employment text-white',
-    education: 'bg-category-education text-white',
-  }
-
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6 border border-gray-100"
+      className="bg-white/30 backdrop-blur-lg rounded-xl border border-white/20 shadow-sm hover:shadow-md transition-shadow transform hover:scale-105 cursor-pointer p-6"
     >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-lg font-semibold text-text flex-1">{resource.name}</h3>
@@ -34,9 +32,7 @@ export function ResourceCard({ resource, onClick }: ResourceCardProps) {
         {resource.categories.map((category) => (
           <span
             key={category}
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              categoryColors[category] || 'bg-gray-200 text-gray-700'
-            }`}
+            className={`px-2 py-1 rounded-full text-xs font-medium ${CATEGORY_COLORS[category] || 'bg-gray-200 text-gray-700'} hover:scale-105 transition-transform`}
           >
             {category}
           </span>

@@ -62,5 +62,6 @@ export interface ResourceFilters {
   categories?: Category[]
   search?: string
   city?: string
+  zip?: string
   verified?: boolean
 }

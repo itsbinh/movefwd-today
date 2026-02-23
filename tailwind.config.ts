@@ -1,26 +1,23 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       colors: {
         // Brand colors
         primary: {
-          DEFAULT: '#E76F51',
-          50: '#FDF5F3',
-          100: '#FAE8E3',
-          200: '#F5D1C7',
-          300: '#EFB9A9',
-          400: '#E89C85',
-          500: '#E76F51',
-          600: '#D94F2A',
-          700: '#B33F1F',
-          800: '#8D3119',
-          900: '#672313',
+          DEFAULT: '#5A8DFF',
+          50: '#E6EEFF',
+          100: '#CCE0FF',
+          200: '#99C2FF',
+          300: '#66A3FF',
+          400: '#3385FF',
+          500: '#5A8DFF',
+          600: '#0066FF',
+          700: '#0052CC',
+          800: '#003D99',
+          900: '#002966',
         },
         secondary: {
           DEFAULT: '#2A9D8F',

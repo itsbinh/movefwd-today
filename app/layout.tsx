@@ -19,15 +19,13 @@ export const metadata: Metadata = {
   description: 'Connect people to local resources — empowering, not pitying',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+import Providers from '@/components/Providers'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${fraunces.variable} font-sans`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
