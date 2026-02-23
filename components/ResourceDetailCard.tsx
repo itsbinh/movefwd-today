@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { X } from 'lucide-react'
 import type { Resource } from '@/types/resources'
 
@@ -26,11 +27,14 @@ export function ResourceDetailCard({ resource, onClose }: ResourceDetailCardProp
       } z-50`}
     >
       <div className="p-4 flex items-start gap-4">
-        <img
-          src={`https://i.pravatar.cc/150?u=${resource.id}`}
-          alt={resource.name}
-          className="w-16 h-16 rounded-full object-cover border border-white/30"
-        />
+        <div className="relative w-16 h-16 flex-shrink-0">
+          <Image
+            src={`https://i.pravatar.cc/150?u=${resource.id}`}
+            alt={resource.name}
+            fill
+            className="rounded-full object-cover border border-white/30"
+          />
+        </div>
         <div className="flex-1">
           <h2 className="text-xl font-semibold text-text">{resource.name}</h2>
           {resource.description && (

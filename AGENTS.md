@@ -1,140 +1,38 @@
-# AGENTS.md - Movefwd.today Developer Guide
+# AGENTS.md
 
-> This file provides context for AI agents working on the Movefwd.today codebase.
-> See `stack.md` for tech stack details and `tasks.md` for active work.
+This file provides guidance to agents when working with code in this repository.
 
-## Build, Lint & Test Commands
+## Project-Specific Gotchas
 
-### Development
+### Tailwind Semantic Colors
+Use semantic color tokens instead of hardcoded values:
+- `text-text` / `text-text-muted` for text
+- `bg-background` for backgrounds
+- Category prefixes: `bg-category-food`, `bg-category-housing`, `bg-category-health`, `bg-category-legal`, `bg-category-employment`, `bg-category-education`
 
-```bash
-npm run dev          # Start dev server at http://localhost:3000
-npm run build        # Production build
-npm run start        # Start production server
-```
+### Category Styling
+[`CATEGORY_COLORS`](/components/ResourceCard.tsx:4) exported from `ResourceCard.tsx` is the canonical source for category badge styling. Values: `food`, `housing`, `health`, `legal`, `employment`, `education`.
 
-### Testing (Vitest)
+### Public Categories Filter
+[`PUBLIC_CATEGORIES`](/components/ResourceList.tsx:8) in `ResourceList.tsx` filters which categories are displayed in the UI. Resources without these categories are excluded from the list.
 
-```bash
-npm test             # Run all tests (watch mode)
-npm run test:run     # Run tests once (no watch)
-npm test -- path/to/test.test.tsx    # Single test file
-npm test -- -t "pattern"             # Tests matching name pattern
-npm test -- --coverage               # With coverage
-```
+### API Mock in Development
+[`app/api/resources/route.ts`](/app/api/resources/route.ts:7) returns mock data when `NODE_ENV === 'development'`. This bypasses Supabase for local testing.
 
-### Linting & Formatting
+### Resource Type - Required `state`
+In [`types/resources.ts`](/types/resources.ts:15), `state` is required (`string`), but `city` and `zip` are nullable (`string | null`). Always handle null checks for city/zip.
 
-```bash
-npm run lint         # Run ESLint
-npm run lint:fix     # Fix auto-fixable issues
-npm run format       # Format with Prettier
-npm run typecheck    # TypeScript type checking
-```
+### Mapbox CSS Required
+[`app/globals.css`](/app/globals.css:5) must import `mapbox-gl/dist/mapbox-gl.css` for maps to render correctly.
 
-### Database (Supabase)
+### API Response Format
+API returns `{ data: Resource[], count: number }` - see [route.ts](/app/api/resources/route.ts:27) and [useResources.ts](/hooks/useResources.ts:37).
 
-```bash
-npx supabase start        # Start local Supabase
-npx supabase db reset     # Reset local DB
-npx supabase db push      # Push schema changes
-npx supabase migration new <name>  # Create migration
-```
+### React Query staleTime
+[`hooks/useResources.ts`](/hooks/useResources.ts:44) sets `staleTime: 1000 * 60` (1 minute).
 
----
+### Verified Filter Behavior
+In [route.ts](/app/api/resources/route.ts:42), `?verified=true` filters for verified resources, but `?verified=false` is treated as `undefined` (returns all). Use no `verified` param to get all resources.
 
-## Code Style Guidelines
-
-### General Principles
-
-- **Be concise.** No verbose comments, no unnecessary abstractions.
-- **Fail fast.** Use TypeScript strictly — avoid `any`.
-- **Component-first.** Keep components small, focused, and co-located with their tests.
-
-### TypeScript
-
-- Always type function parameters and return values.
-- Use explicit types over inference for props and API responses.
-- Avoid `any`. Use `unknown` if type is truly uncertain, then narrow with type guards.
-- Strict mode enabled in tsconfig.json.
-
-### React & Next.js
-
-- **Use Server Components by default** — add `'use client'` only when needed (hooks, event handlers, browser APIs).
-- **File naming:** Components: `ResourceCard.tsx` (PascalCase), Hooks: `useResources.ts` (camelCase, `use` prefix), Utils: `formatAddress.ts` (camelCase), Types: `resources.ts` (plural).
-- **Colocate** component, test, and styles in same directory.
-- **Use React Query for server state**, Zustand for client state.
-
-### Imports
-
-- **Order:** External libs → Internal components/hooks → Utils/types → Styles (last).
-- **Use path aliases (`@/`)** for project imports, not relative paths beyond one level.
-- Path alias `@/*` points to project root.
-
-### Tailwind CSS
-
-- Use utility classes — avoid custom CSS unless unavoidable.
-- Extract repeated patterns to components.
-- Use semantic colors from `tailwind.config.ts` (primary, secondary, category colors).
-- Avoid hardcoded hex values.
-
-### Naming Conventions
-
-| Type                | Convention               | Example             |
-| ------------------- | ------------------------ | ------------------- |
-| Components          | PascalCase               | `ResourceMap`       |
-| Hooks               | camelCase + `use` prefix | `useResourceSearch` |
-| Functions           | camelCase, verb-first    | `fetchResources()`  |
-| Types/Interfaces    | PascalCase, descriptive  | `Resource`          |
-| Constants           | SCREAMING_SNAKE          | `MAX_RESULTS`       |
-| Files (components)  | PascalCase               | `ResourceCard.tsx`  |
-| Files (utils/hooks) | camelCase                | `formatAddress.ts`  |
-
-### Error Handling
-
-- Use error boundaries for component failures.
-- Return typed errors from API functions with proper status checks.
-- Show user-friendly errors — don't expose raw error messages.
-
-### Database (Supabase)
-
-- Use typed Supabase clients — never raw SQL in frontend code.
-- Row Level Security (RLS) is mandatory — all tables must have policies.
-- Migrations only — never modify schema directly in production.
-
----
-
-## Project Structure
-
-```
-movefwd-today/
-├── app/                    # Next.js App Router
-│   ├── (routes)/          # Page routes
-│   ├── components/        # Shared UI components
-│   ├── lib/               # Utilities, clients
-│   └── api/               # API routes
-├── components/            # Feature components (colocated)
-├── hooks/                 # Custom React hooks
-├── lib/                   # Supabase client, utils
-├── types/                 # TypeScript types
-├── supabase/
-│   ├── migrations/       # DB migrations
-│   └── seed/             # Seed data
-└── public/               # Static assets
-```
-
----
-
-## Quick Reference
-
-| Task            | Command                            |
-| --------------- | ---------------------------------- |
-| Run dev server  | `npm run dev`                      |
-| Run single test | `npm test -- path/to/test.test.ts` |
-| Lint            | `npm run lint`                     |
-| Type check      | `npm run typecheck`                |
-| Reset DB        | `npx supabase db reset`            |
-
----
-
-_Last updated: 2026-02-23_
+### Font Variables
+Fonts use CSS variables: `--font-dm-sans` (DM Sans) and `--font-fraunces` (Fraunces). Set via [app/layout.tsx](/app/layout.tsx:7).

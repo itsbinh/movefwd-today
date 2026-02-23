@@ -27,7 +27,10 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
 
   const filteredResources = resources.filter((resource) => {
     // Exclude resources that aren't in public categories
-    if (!resource.categories.some((cat) => PUBLIC_CATEGORIES.includes(cat as any))) return false
+    const hasPublicCategory = resource.categories.some((cat) =>
+      PUBLIC_CATEGORIES.includes(cat)
+    )
+    if (!hasPublicCategory) return false
 
     const matchesSearch =
       searchQuery === '' ||
@@ -64,6 +67,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            aria-label="Search resources"
           />
         </div>
 
@@ -71,6 +75,8 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
+            aria-label={showFilters ? 'Hide filters' : 'Show filters'}
+            aria-expanded={showFilters}
           >
             <Filter className="w-4 h-4" />
             Filters
@@ -85,6 +91,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
             <button
               onClick={clearFilters}
               className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text-muted hover:text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
+              aria-label="Clear all filters"
             >
               <X className="w-4 h-4" />
               Clear

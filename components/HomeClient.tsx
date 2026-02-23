@@ -128,6 +128,7 @@ export default function HomeClient() {
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               className="px-2 py-1 bg-gray-200/30 text-text rounded-full disabled:opacity-50"
+              aria-label="Previous page"
             >
               ‹ Prev
             </button>
@@ -138,6 +139,7 @@ export default function HomeClient() {
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               className="px-2 py-1 bg-gray-200/30 text-text rounded-full disabled:opacity-50"
+              aria-label="Next page"
             >
               Next ›
             </button>

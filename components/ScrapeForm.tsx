@@ -18,6 +18,7 @@ export function ScrapeForm() {
       const data = await res.json()
       if (res.ok) {
         setStatus(`Inserted ${data.inserted?.length ?? 0} resources`)
+        setUrl('')
       } else {
         setStatus(`Error: ${data.error ?? 'unknown'}`)
       }
@@ -39,6 +40,7 @@ export function ScrapeForm() {
       <button
         type="submit"
         className="px-3 py-1 bg-primary/30 text-primary backdrop-blur-md rounded-full hover:bg-primary/50 transform hover:scale-105 transition-colors transition-transform"
+        aria-label="Import resources from URL"
       >
         Import
       </button>

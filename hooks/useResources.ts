@@ -5,20 +5,22 @@ interface UseResourcesParams {
   categories?: Category[]
   search?: string
   city?: string
+  state?: string
   zip?: string
+  eligibility?: string[]
   verified?: boolean
   page?: number
   pageSize?: number
 }
 
 export function useResources(params: UseResourcesParams) {
-  const { categories, search, city, zip, verified, page = 1, pageSize = 20 } = params
+  const { categories, search, city, state, zip, eligibility, verified, page = 1, pageSize = 20 } = params
 
   const offset = (page - 1) * pageSize
 
   const queryKey = [
     'resources',
-    { categories, search, city, zip, verified, offset, limit: pageSize },
+    { categories, search, city, state, zip, eligibility, verified, offset, limit: pageSize },
   ]
 
   const fetchResources = async () => {
@@ -26,7 +28,9 @@ export function useResources(params: UseResourcesParams) {
     if (categories?.length) searchParams.append('categories', categories.join(','))
     if (search) searchParams.append('search', search)
     if (city) searchParams.append('city', city)
+    if (state) searchParams.append('state', state)
     if (zip) searchParams.append('zip', zip)
+    if (eligibility?.length) searchParams.append('eligibility', eligibility.join(','))
     if (verified !== undefined) searchParams.append('verified', String(verified))
     searchParams.append('limit', String(pageSize))
     searchParams.append('offset', String(offset))
