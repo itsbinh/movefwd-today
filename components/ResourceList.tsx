@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Search, X, Filter } from 'lucide-react'
 import { ResourceCard } from './ResourceCard'
-import type { Resource, Category } from '@/types/resources'
+import type { Category } from '@/types/resources'
+import type { ResourceCardDTO } from '@/modules/resources/domain/types'
 
 export const PUBLIC_CATEGORIES = [
   'food',
@@ -15,9 +16,9 @@ export const PUBLIC_CATEGORIES = [
 ] as const
 
 interface ResourceListProps {
-  resources: Resource[]
-  categories: Category[]
-  onResourceClick?: (resource: Resource) => void
+  resources: ResourceCardDTO[]
+  categories: readonly Category[]
+  onResourceClick?: (resource: ResourceCardDTO) => void
 }
 
 export function ResourceList({ resources, categories, onResourceClick }: ResourceListProps) {
@@ -25,24 +26,23 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [showFilters, setShowFilters] = useState(false)
 
-  const filteredResources = resources.filter((resource) => {
-    // Exclude resources that aren't in public categories
-    const hasPublicCategory = resource.categories.some((cat) =>
-      PUBLIC_CATEGORIES.includes(cat)
-    )
-    if (!hasPublicCategory) return false
+  const filteredResources = useMemo(() => {
+    return resources.filter((resource) => {
+      const hasPublicCategory = resource.categories.some((cat) => PUBLIC_CATEGORIES.includes(cat))
+      if (!hasPublicCategory) return false
 
-    const matchesSearch =
-      searchQuery === '' ||
-      resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+      const matchesSearch =
+        searchQuery === '' ||
+        resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
 
-    const matchesCategories =
-      selectedCategories.length === 0 ||
-      selectedCategories.some((cat) => resource.categories.includes(cat))
+      const matchesCategories =
+        selectedCategories.length === 0 ||
+        selectedCategories.some((cat) => resource.categories.includes(cat))
 
-    return matchesSearch && matchesCategories
-  })
+      return matchesSearch && matchesCategories
+    })
+  }, [resources, searchQuery, selectedCategories])
 
   const toggleCategory = (category: Category) => {
     setSelectedCategories((prev) =>
@@ -57,7 +57,6 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search and Filters */}
       <div className="bg-white border-b border-gray-200 p-4 space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
@@ -74,7 +73,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
         <div className="flex items-center justify-between">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
+            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text hover:bg-gray-100"
             aria-label={showFilters ? 'Hide filters' : 'Show filters'}
             aria-expanded={showFilters}
           >
@@ -90,7 +89,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
           {(searchQuery || selectedCategories.length > 0) && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text-muted hover:text-text hover:bg-white/30 backdrop-blur-md transform hover:scale-105 transition-colors transition-transform"
+              className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-text-muted hover:text-text hover:bg-gray-100"
               aria-label="Clear all filters"
             >
               <X className="w-4 h-4" />
@@ -108,7 +107,7 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   selectedCategories.includes(category)
                     ? 'bg-primary text-white'
-                    : 'bg-white/30 text-text hover:bg-white/50 backdrop-blur-md transform hover:scale-105'
+                    : 'bg-gray-100 text-text hover:bg-gray-200'
                 }`}
               >
                 {category}
@@ -118,19 +117,16 @@ export function ResourceList({ resources, categories, onResourceClick }: Resourc
         )}
       </div>
 
-      {/* Results Count */}
       <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
         <p className="text-sm text-text-muted">
-          {filteredResources.length} {filteredResources.length === 1 ? 'resource' : 'resources'}{' '}
-          found
+          {filteredResources.length} {filteredResources.length === 1 ? 'resource' : 'resources'} found
         </p>
       </div>
 
-      {/* Resource List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {filteredResources.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-text-muted">No resources found matching your criteria.</p>
+            <p className="text-text-muted">No resources found. Try removing a filter or changing ZIP.</p>
           </div>
         ) : (
           filteredResources.map((resource) => (

@@ -1,106 +1,172 @@
 /**
- * Caching Layer for API Responses
- * In-memory cache with configurable TTL and invalidation support
+ * Shared-first caching layer.
+ * Uses Upstash Redis REST when configured; falls back to in-memory cache.
  */
 
 import type { CacheEntry, CacheConfig } from './types'
+import { upstashConfig } from '@/lib/server/env'
+import { logger } from '@/lib/server/logger'
 
-// Default cache TTL: 1 hour (in seconds)
 const DEFAULT_TTL_SECONDS = 3600
-
-// Maximum stale time: 24 hours (in seconds)
 const MAX_STALE_SECONDS = 86400
 
-// Cache storage
 const memoryCache = new Map<string, CacheEntry<unknown>>()
 
-/**
- * Get a value from cache if it exists and is not expired
- */
-export function getFromCache<T>(key: string): T | null {
-  const entry = memoryCache.get(key) as CacheEntry<T> | undefined
-
-  if (!entry) {
-    return null
-  }
-
-  const now = Date.now()
-
-  // Check if entry has expired
-  if (now >= entry.expiry) {
-    // Check if within stale period
-    if (entry.staleAt && now < entry.staleAt) {
-      // Return stale data but log that it's stale
-      console.warn(`Cache key '${key}' returned stale data`)
-      return entry.data
-    }
-
-    // Fully expired, remove from cache
-    memoryCache.delete(key)
-    return null
-  }
-
-  return entry.data
+interface CacheStore {
+  get<T>(key: string): Promise<T | null>
+  set<T>(key: string, value: T, ttlSeconds: number): Promise<void>
+  del(key: string): Promise<boolean>
 }
 
-/**
- * Set a value in cache with TTL
- */
-export function setCache<T>(key: string, data: T, ttlSeconds: number = DEFAULT_TTL_SECONDS): void {
-  const now = Date.now()
-  const expiry = now + ttlSeconds * 1000
-  const staleAt = MAX_STALE_SECONDS > ttlSeconds ? now + MAX_STALE_SECONDS * 1000 : undefined
+class MemoryCacheStore implements CacheStore {
+  async get<T>(key: string): Promise<T | null> {
+    const entry = memoryCache.get(key) as CacheEntry<T> | undefined
+    if (!entry) return null
 
-  memoryCache.set(key, {
-    data,
-    expiry,
-    staleAt,
-  } as CacheEntry<unknown>)
-}
-
-/**
- * Delete a specific key from cache
- */
-export function deleteFromCache(key: string): boolean {
-  return memoryCache.delete(key)
-}
-
-/**
- * Invalidate cache entries matching a pattern
- */
-export function invalidateCache(pattern: string): number {
-  let count = 0
-  const regex = new RegExp(pattern)
-
-  for (const key of memoryCache.keys()) {
-    if (regex.test(key)) {
+    const now = Date.now()
+    if (now >= entry.expiry) {
+      if (entry.staleAt && now < entry.staleAt) {
+        logger.warn('Returning stale cache data', { key })
+        return entry.data
+      }
       memoryCache.delete(key)
-      count++
+      return null
     }
+
+    return entry.data
+  }
+
+  async set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
+    const now = Date.now()
+    const expiry = now + ttlSeconds * 1000
+    const staleAt = now + MAX_STALE_SECONDS * 1000
+    memoryCache.set(key, {
+      data: value,
+      expiry,
+      staleAt,
+    } as CacheEntry<unknown>)
+  }
+
+  async del(key: string): Promise<boolean> {
+    return memoryCache.delete(key)
+  }
+}
+
+class UpstashCacheStore implements CacheStore {
+  private url: string
+  private token: string
+  private fallback = new MemoryCacheStore()
+
+  constructor(url: string, token: string) {
+    this.url = url
+    this.token = token
+  }
+
+  private async call(path: string, body?: unknown) {
+    const response = await fetch(`${this.url}${path}`, {
+      method: body ? 'POST' : 'GET',
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Upstash request failed: ${response.status}`)
+    }
+
+    return response.json() as Promise<{ result: unknown }>
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    try {
+      const payload = await this.call(`/get/${encodeURIComponent(key)}`)
+      if (!payload.result) return null
+      return JSON.parse(String(payload.result)) as T
+    } catch (error) {
+      logger.warn('Upstash get failed, falling back to memory cache', {
+        key,
+        error: error instanceof Error ? error.message : 'unknown',
+      })
+      return this.fallback.get<T>(key)
+    }
+  }
+
+  async set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
+    try {
+      await this.call('/set', [key, JSON.stringify(value), 'EX', ttlSeconds])
+    } catch (error) {
+      logger.warn('Upstash set failed, writing to memory cache', {
+        key,
+        error: error instanceof Error ? error.message : 'unknown',
+      })
+      await this.fallback.set(key, value, ttlSeconds)
+    }
+  }
+
+  async del(key: string): Promise<boolean> {
+    try {
+      await this.call(`/del/${encodeURIComponent(key)}`)
+      return true
+    } catch (error) {
+      logger.warn('Upstash del failed, deleting memory cache key', {
+        key,
+        error: error instanceof Error ? error.message : 'unknown',
+      })
+      return this.fallback.del(key)
+    }
+  }
+}
+
+const store: CacheStore =
+  upstashConfig.url && upstashConfig.token
+    ? new UpstashCacheStore(upstashConfig.url, upstashConfig.token)
+    : new MemoryCacheStore()
+
+export async function getFromCache<T>(key: string): Promise<T | null> {
+  return store.get<T>(key)
+}
+
+export async function setCache<T>(
+  key: string,
+  data: T,
+  ttlSeconds: number = DEFAULT_TTL_SECONDS
+): Promise<void> {
+  await store.set(key, data, ttlSeconds)
+}
+
+export async function deleteFromCache(key: string): Promise<boolean> {
+  return store.del(key)
+}
+
+export async function invalidateCache(prefix: string): Promise<number> {
+  let count = 0
+  const keysToDelete: string[] = []
+
+  memoryCache.forEach((_value, key) => {
+    if (key.startsWith(prefix)) keysToDelete.push(key)
+  })
+
+  for (const key of keysToDelete) {
+    if (await store.del(key)) count += 1
   }
 
   return count
 }
 
-/**
- * Clear all cache entries
- */
 export function clearCache(): void {
   memoryCache.clear()
 }
 
-/**
- * Get cache statistics
- */
 export function getCacheStats(): { size: number; keys: string[] } {
   const now = Date.now()
   const keys: string[] = []
 
-  for (const [key, entry] of memoryCache.entries()) {
-    if (entry.expiry > now) {
-      keys.push(key)
-    }
-  }
+  memoryCache.forEach((entry, key) => {
+    if (entry.expiry > now) keys.push(key)
+  })
 
   return {
     size: memoryCache.size,
@@ -108,52 +174,37 @@ export function getCacheStats(): { size: number; keys: string[] } {
   }
 }
 
-/**
- * Clean up expired entries from cache
- */
 export function cleanupCache(): number {
   const now = Date.now()
   let removed = 0
 
-  for (const [key, entry] of memoryCache.entries()) {
+  memoryCache.forEach((entry, key) => {
     if (entry.expiry <= now && (!entry.staleAt || entry.staleAt <= now)) {
       memoryCache.delete(key)
-      removed++
+      removed += 1
     }
-  }
+  })
 
   return removed
 }
 
-/**
- * Get cached or fetch data
- * If cached data exists and is not expired, return it
- * Otherwise, call fetchFn and cache the result
- */
 export async function getCachedOrFetch<T>(
   key: string,
   fetchFn: () => Promise<T>,
   ttlSeconds: number = DEFAULT_TTL_SECONDS
 ): Promise<{ data: T; cached: boolean }> {
-  // Try to get from cache first
-  const cachedData = getFromCache<T>(key)
+  const cachedData = await getFromCache<T>(key)
 
   if (cachedData !== null) {
     return { data: cachedData, cached: true }
   }
 
-  // Fetch fresh data
   const data = await fetchFn()
-
-  // Store in cache
-  setCache(key, data, ttlSeconds)
+  await setCache(key, data, ttlSeconds)
 
   return { data, cached: false }
 }
 
-/**
- * Cache configuration for different data types
- */
 export const cacheConfigs: Record<string, CacheConfig> = {
   resources: {
     key: 'resources',
@@ -162,12 +213,12 @@ export const cacheConfigs: Record<string, CacheConfig> = {
   },
   sourceStatus: {
     key: 'source_status',
-    ttlSeconds: 300, // 5 minutes
+    ttlSeconds: 300,
     maxStaleSeconds: 600,
   },
   syncStatus: {
     key: 'sync_status',
-    ttlSeconds: 60, // 1 minute
+    ttlSeconds: 60,
     maxStaleSeconds: 120,
   },
   externalServices: {
@@ -177,15 +228,12 @@ export const cacheConfigs: Record<string, CacheConfig> = {
   },
 }
 
-/**
- * Generate cache key from parameters
- */
 export function generateCacheKey(
   prefix: string,
   params: Record<string, string | number | boolean | undefined>
 ): string {
   const sortedParams = Object.entries(params)
-    .filter(([_, value]) => value !== undefined)
+    .filter(([, value]) => value !== undefined)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `${key}=${value}`)
     .join('&')
@@ -193,12 +241,11 @@ export function generateCacheKey(
   return `${prefix}${sortedParams ? `?${sortedParams}` : ''}`
 }
 
-// Set up periodic cleanup (every 5 minutes)
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const removed = cleanupCache()
     if (removed > 0) {
-      console.log(`Cache cleanup: removed ${removed} expired entries`)
+      logger.info('Cache cleanup removed expired entries', { removed })
     }
   }, 5 * 60 * 1000)
 }

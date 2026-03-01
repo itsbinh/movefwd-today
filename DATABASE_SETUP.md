@@ -42,3 +42,12 @@ supabase db seed
 - `supabase/seed/001_sample_data.sql` - Sample resources
 
 Let me know once you've run the migrations and I'll verify the connection works!
+# Quick Start (Hosted Supabase Free)
+
+Use [SUPABASE_FREE_SETUP.md](/Users/binh/projects/movefwd-today/SUPABASE_FREE_SETUP.md) for the recommended hosted setup path.
+
+Migration order now includes trust-layer tables:
+
+1. `supabase/migrations/001_initial_schema.sql`
+2. `supabase/migrations/002_resource_trust_layer.sql`
+3. `supabase/seed/001_sample_data.sql`

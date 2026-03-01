@@ -132,7 +132,7 @@ export interface CacheConfig {
 export interface CacheEntry<T> {
   data: T
   expiry: number
-  staleAt: number
+  staleAt?: number
 }
 
 // Sync result

@@ -209,7 +209,7 @@ export function SearchFiltersPanel({
               Eligibility Requirements
             </label>
             <div
-              className="grid grid-cols-1 sm:grid-cols-:grid-cols2 lg-3 gap-2"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
               role="group"
               aria-label="Select eligibility options"
             >

@@ -2,7 +2,9 @@ import { supabase } from './supabase'
 import type { Resource, ResourceFilters, Category } from '@/types/resources'
 
 export async function getResources(filters?: ResourceFilters): Promise<Resource[]> {
-  let query = supabase.from('resources').select('*').order('created_at', { ascending: false })
+  let query = (supabase.from('resources' as never) as any)
+    .select('*')
+    .order('created_at', { ascending: false })
 
   if (filters?.categories && filters.categories.length > 0) {
     query = query.contains('categories', filters.categories)
@@ -27,51 +29,46 @@ export async function getResources(filters?: ResourceFilters): Promise<Resource[
   const { data, error } = await query
 
   if (error) {
-    console.error('Error fetching resources:', error)
     return []
   }
 
-  return data || []
+  return (data || []) as Resource[]
 }
 
 export async function getResourceById(id: string): Promise<Resource | null> {
-  const { data, error } = await supabase.from('resources').select('*').eq('id', id).single()
+  const { data, error } = await (supabase.from('resources' as never) as any)
+    .select('*')
+    .eq('id', id)
+    .single()
 
   if (error) {
-    console.error('Error fetching resource:', error)
     return null
   }
 
-  return data
+  return data as Resource
 }
 
 export async function getCities(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('resources')
+  const { data, error } = await (supabase.from('resources' as never) as any)
     .select('city')
     .not('city', 'is', null)
     .order('city')
 
   if (error) {
-    console.error('Error fetching cities:', error)
     return []
   }
 
-  const citySet = new Set(data?.map((r) => r.city).filter(Boolean))
-  const cities = Array.from(citySet)
-  return cities as string[]
+  const citySet = new Set((data ?? []).map((r: { city: string | null }) => r.city).filter(Boolean))
+  return Array.from(citySet) as string[]
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const { data, error } = await supabase.from('resources').select('categories')
+  const { data, error } = await (supabase.from('resources' as never) as any).select('categories')
 
   if (error) {
-    console.error('Error fetching categories:', error)
     return []
   }
 
-  const allCategories = data?.flatMap((r) => r.categories) || []
-  const categorySet = new Set(allCategories)
-  const uniqueCategories = Array.from(categorySet) as Category[]
-  return uniqueCategories
+  const allCategories = (data ?? []).flatMap((r: { categories: Category[] }) => r.categories)
+  return Array.from(new Set(allCategories)) as Category[]
 }

@@ -6,6 +6,43 @@ export type OpportunityType = 'volunteer' | 'donation' | 'both'
 
 // HSDS-compatible phone types
 export type PhoneType = 'voice' | 'fax' | 'tty' | 'sms'
+export type AvailabilityStatus = 'unknown' | 'open' | 'limited' | 'full' | 'waitlist'
+
+export interface ResourceCore {
+  id: string
+  name: string
+  description: string | null
+  categories: Category[]
+  eligibility: string | null
+  address: string | null
+  city: string | null
+  state: string
+  zip: string | null
+  latitude: number | null
+  longitude: number | null
+  phone: string | null
+  website: string | null
+  application_guide: string | null
+  source: string | null
+  source_id: string | null
+  organization_name: string | null
+  service_area: string | null
+}
+
+export interface ResourceAvailability {
+  availability_status: AvailabilityStatus
+  last_confirmed_at: string | null
+  confirmation_source: string | null
+  confidence_score: number | null
+}
+
+export interface ResourceVerification {
+  verified: boolean
+  verification_badge: 'verified_partner' | 'verified_api' | 'community' | 'unverified'
+  data_source_label: string
+  last_verified_at: string | null
+  freshness_state: 'fresh' | 'aging' | 'stale' | 'unknown'
+}
 
 // HSDS-compatible resource with extended fields
 export interface Resource {
@@ -38,6 +75,13 @@ export interface Resource {
   service_area: string | null
   last_verified_at: string | null
   data_source_url: string | null
+  availability_status?: AvailabilityStatus
+  last_confirmed_at?: string | null
+  confirmation_source?: string | null
+  confidence_score?: number | null
+  verification_badge?: ResourceVerification['verification_badge']
+  data_source_label?: string
+  freshness_state?: ResourceVerification['freshness_state']
   created_at: string
   updated_at: string
 }

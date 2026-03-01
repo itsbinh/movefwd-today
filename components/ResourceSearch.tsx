@@ -4,24 +4,19 @@ import { useState, useCallback, useEffect } from 'react'
 import { SearchBar } from './SearchBar'
 import { SearchFiltersPanel } from './SearchFilters'
 import { useResources } from '@/hooks/useResources'
-import type { Resource, Category } from '@/types/resources'
+import type { ResourceCardDTO } from '@/modules/resources/domain/types'
 import type { SearchFilters } from '@/types/search'
 
 interface ResourceSearchProps {
-  onResults?: (resources: Resource[], count: number) => void
-  onResourceClick?: (resource: Resource) => void
+  onResults?: (resources: ResourceCardDTO[], count: number) => void
+  onResourceClick?: (resource: ResourceCardDTO) => void
   initialFilters?: Partial<SearchFilters>
   pageSize?: number
   className?: string
 }
 
-/**
- * Integrated search component combining SearchBar and SearchFilters
- * with resource fetching and display
- */
 export function ResourceSearch({
   onResults,
-  onResourceClick,
   initialFilters,
   pageSize = 20,
   className = '',
@@ -37,20 +32,19 @@ export function ResourceSearch({
     verified: initialFilters?.verified,
   })
 
-  // Build query params for useResources
   const queryParams = {
     search: currentFilters.search || undefined,
     city: currentFilters.city || undefined,
     state: currentFilters.state || undefined,
     zip: currentFilters.zip || undefined,
     categories: currentFilters.categories.length > 0 ? currentFilters.categories : undefined,
+    eligibility: currentFilters.eligibility.length > 0 ? currentFilters.eligibility : undefined,
     verified: currentFilters.verified,
     pageSize,
   }
 
   const { data, isLoading, error, refetch } = useResources(queryParams)
 
-  // Report results to parent
   useEffect(() => {
     if (data) {
       onResults?.(data.data, data.count)
@@ -83,7 +77,6 @@ export function ResourceSearch({
         initialFilters={currentFilters}
       />
 
-      {/* Loading/Error States */}
       {isLoading && (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -93,10 +86,7 @@ export function ResourceSearch({
       {error && (
         <div className="text-center py-8 text-red-500">
           <p>Error loading resources. Please try again.</p>
-          <button
-            onClick={() => refetch()}
-            className="mt-2 text-sm underline hover:text-red-600"
-          >
+          <button onClick={() => refetch()} className="mt-2 text-sm underline hover:text-red-600">
             Retry
           </button>
         </div>
@@ -105,9 +95,6 @@ export function ResourceSearch({
   )
 }
 
-/**
- * Hook for using search functionality
- */
 export function useResourceSearch(initialFilters?: Partial<SearchFilters>) {
   const [filters, setFilters] = useState<SearchFilters>({
     search: initialFilters?.search ?? '',

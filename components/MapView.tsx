@@ -1,6 +1,8 @@
 'use client'
+
 import dynamic from 'next/dynamic'
-import type { Resource, Category } from '@/types/resources'
+import type { Category } from '@/types/resources'
+import type { ResourceCardDTO } from '@/modules/resources/domain/types'
 
 const LazyMap = dynamic(() => import('./MapViewInner'), {
   ssr: false,
@@ -8,9 +10,9 @@ const LazyMap = dynamic(() => import('./MapViewInner'), {
 })
 
 interface MapViewProps {
-  resources: Resource[]
+  resources: ResourceCardDTO[]
   selectedCategories?: Category[]
-  onResourceClick?: (resource: Resource) => void
+  onResourceClick?: (resource: ResourceCardDTO) => void
 }
 
 export function MapView(props: MapViewProps) {
